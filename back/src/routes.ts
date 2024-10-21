@@ -1,23 +1,28 @@
-import { UserController } from "./controller/UserController"
+import { ExpensesResolver } from "./entity/expenses/resolver"
 
-export const Routes = [{
-    method: "get",
-    route: "/users",
-    controller: UserController,
-    action: "all"
-}, {
-    method: "get",
-    route: "/users/:id",
-    controller: UserController,
-    action: "one"
-}, {
-    method: "post",
-    route: "/users",
-    controller: UserController,
-    action: "save"
-}, {
-    method: "delete",
-    route: "/users/:id",
-    controller: UserController,
-    action: "remove"
-}]
+export const Routes = [
+    {
+        method: "get",
+        route: "/getExpenses",
+        controller: ExpensesResolver,
+        action: "getExpenses"
+    },
+    {
+        method: "post",
+        route: "/createExpense",
+        controller: ExpensesResolver,
+        action: "createExpense"
+    },
+    {
+        method: "delete",
+        route: "/deleteExpense/:id",
+        controller: ExpensesResolver,
+        action: "deleteExpense"
+    },
+    {
+        method: "patch",
+        route: "/updateExpense/:id",
+        controller: ExpensesResolver,
+        action: "updateExpense"
+    },
+]
