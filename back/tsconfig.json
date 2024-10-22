@@ -11,9 +11,6 @@
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true,
-      "paths": {
-         "@/*": ["src/*"]
-      },
       "baseUrl": "./"
    }
 }

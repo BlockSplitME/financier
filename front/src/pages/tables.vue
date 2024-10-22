@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  $END$
+  Таблица
 </template>
 
 <style scoped lang="css">

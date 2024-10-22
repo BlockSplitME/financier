@@ -1,6 +1,6 @@
 import { AppDataSource } from "../../data-source"
 import { NextFunction, Request, Response } from "express"
-import { Expenses } from "../expenses"
+import { Expenses } from "./index"
 import {Between, FindOptionsWhere} from "typeorm";
 
 export class ExpensesResolver {

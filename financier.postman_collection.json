@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "7aa98a4d-c3c6-47de-b08f-9f7a57d36951",
+		"name": "financier",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36668564"
+	},
+	"item": [
+		{
+			"name": "createExpense",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"date\": \"2024-09-28T00:00:00.000Z\",\n    \"name\": \"Тест4\",\n    \"group\": \"тест\",\n    \"subgroup\": \"тест_тест\",\n    \"description\": \"Тестовый пример 4\",\n    \"sum\": 4\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/createExpense",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"createExpense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getExpenses",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/getExpenses",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"getExpenses"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Тест3",
+							"disabled": true
+						},
+						{
+							"key": "group",
+							"value": "тест2",
+							"disabled": true
+						},
+						{
+							"key": "subgroup",
+							"value": "тест_тест",
+							"disabled": true
+						},
+						{
+							"key": "start_timestamp",
+							"value": "2024-09-29T00:00:00.000Z",
+							"disabled": true
+						},
+						{
+							"key": "end_timestamp",
+							"value": "2024-09-30T00:00:00.000Z",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteExpense",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/deleteExpense/7",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"deleteExpense",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateExpense",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"timestamp\": \"2024-10-30T00:00:00.000Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/updateExpense/{{patch_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"updateExpense",
+						"{{patch_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "delete_id",
+			"value": "3",
+			"type": "string"
+		},
+		{
+			"key": "patch_id",
+			"value": "2",
+			"type": "string"
+		}
+	]
+}
