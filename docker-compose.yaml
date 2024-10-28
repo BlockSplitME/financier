@@ -1,0 +1,37 @@
+services:
+  client:
+    build:
+      context: ./client
+      args:
+        - SERVER_PORT=$SERVER_PORT
+        - PORT=$CLIENT_PORT
+    container_name: financier-client
+    env_file:
+      - .env
+    ports:
+      - $CLIENT_PORT:$CLIENT_PORT
+    networks:
+      - app-network
+  server:
+    build:
+      context: ./server
+      args:
+        - PORT=$SERVER_PORT
+    container_name: financier-server
+    env_file:
+      - .env
+    ports:
+      - $SERVER_PORT:$SERVER_PORT
+    networks:
+      - app-network
+  db:
+    image: nouchka/sqlite3
+    volumes:
+      - db-data:/var/lib/sqlite
+    networks:
+      - app-network
+volumes:
+  db-data:
+networks:
+  app-network:
+    driver: bridge
