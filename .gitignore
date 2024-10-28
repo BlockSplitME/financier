@@ -1,13 +1,13 @@
 .DS_Store
-front/node_modules
-front/dist
+client/node_modules
+client/dist
 
 db
 
-back/node_modules/
-back/build/
-back/tmp/
-back/temp/
+server/node_modules/
+server/dist/
+server/tmp/
+server/temp/
 # local env files
 .env.local
 .env.*.local
