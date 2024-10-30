@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
 import { Routes } from "./routes"
 import * as cors from "cors";
+import {ApiError, errorHandler, InternalServerError} from "./utils";
 
 const PORT = process.env.SERVER_PORT;
 
@@ -18,14 +19,16 @@ AppDataSource.initialize().then(async () => {
         (app as any)[route.method](route.route, (req: Request, res: Response, next: Function) => {
             const result = (new (route.controller as any))[route.action](req, res, next)
             if (result instanceof Promise) {
-                result.then(result => result !== null && result !== undefined ? res.send(result) : undefined)
-
+                result.then(result => result !== null && result !== undefined ? res.send(result) : undefined).catch(err => next(new InternalServerError()));
             } else if (result !== null && result !== undefined) {
                 res.json(result)
             }
         })
     })
+    app.use((error: ApiError, request: Request, response: Response, next: Function) => errorHandler(error, response))
 
-    app.listen(PORT)
-    console.log("Express server has started on port 3000. Open http://localhost:3000/expensesTable to see results");
+
+    app.listen(PORT, () => {
+        console.log("Express server has started on port 3000.");
+    })
 }).catch(error => console.log(error))

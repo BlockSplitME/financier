@@ -1,5 +1,5 @@
 /**
- * router/index.ts
+ * router/transactions.resolver.ts
  *
  * Automatic routes for `./src/pages/*.vue`
  */
