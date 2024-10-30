@@ -7,13 +7,13 @@
 	},
 	"item": [
 		{
-			"name": "createExpense",
+			"name": "createTransaction",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"date\": \"2024-09-28T00:00:00.000Z\",\n    \"name\": \"Тест4\",\n    \"group\": \"тест\",\n    \"subgroup\": \"тест_тест\",\n    \"description\": \"Тестовый пример 4\",\n    \"sum\": 4\n}",
+					"raw": "{\n    \"date\": \"2024-09-28T00:00:00.000Z\",\n    \"name\": \"Тест2\",\n    \"group\": {\n        \"name\": \"тест\",\n        \"description\": \"Описание группы тест\"\n    },\n    \"subgroup\": {\n        \"name\": \"трест_тест\",\n        \"description\": \"Описание подгруппы тест_тест\"\n    },\n    \"description\": \"Тестовый пример\",\n    \"sum\": 2\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,43 +21,45 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/createExpense",
+					"raw": "{{baseUrl}}/createTransaction/{{domain_incomes}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"createExpense"
+						"createTransaction",
+						"{{domain_incomes}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "getExpenses",
+			"name": "getTransactions",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/getExpenses",
+					"raw": "{{baseUrl}}/getTransactions/{{domain_incomes}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"getExpenses"
+						"getTransactions",
+						"{{domain_incomes}}"
 					],
 					"query": [
 						{
 							"key": "name",
-							"value": "Тест3",
+							"value": "Тест2",
 							"disabled": true
 						},
 						{
-							"key": "group",
-							"value": "тест2",
+							"key": "groupName",
+							"value": "тест",
 							"disabled": true
 						},
 						{
-							"key": "subgroup",
+							"key": "subgroupName",
 							"value": "тест_тест",
 							"disabled": true
 						},
@@ -70,6 +72,12 @@
 							"key": "end_timestamp",
 							"value": "2024-09-30T00:00:00.000Z",
 							"disabled": true
+						},
+						{
+							"key": "id",
+							"value": "1",
+							"description": "1",
+							"disabled": true
 						}
 					]
 				}
@@ -77,31 +85,32 @@
 			"response": []
 		},
 		{
-			"name": "deleteExpense",
+			"name": "deleteTransaction",
 			"request": {
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/deleteExpense/7",
+					"raw": "{{baseUrl}}/deleteTransaction/{{domain_expenses}}/5",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"deleteExpense",
-						"7"
+						"deleteTransaction",
+						"{{domain_expenses}}",
+						"5"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "updateExpense",
+			"name": "updateTransaction",
 			"request": {
 				"method": "PATCH",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"timestamp\": \"2024-10-30T00:00:00.000Z\"\n}",
+					"raw": "{\n    \"subgroup\": {\n        \"name\": \"тест_тест1\"\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -109,13 +118,120 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/updateExpense/{{patch_id}}",
+					"raw": "{{baseUrl}}/updateTransaction/{{domain_expenses}}/2",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"updateExpense",
-						"{{patch_id}}"
+						"updateTransaction",
+						"{{domain_expenses}}",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getGroups",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/getGroups/{{domain_incomes}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"getGroups",
+						"{{domain_incomes}}"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "те",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getSubgroups",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/getSubgroups/{{domain_incomes}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"getSubgroups",
+						"{{domain_incomes}}"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateGroup",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Новое описание\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/updateGroup/{{domain_incomes}}/4",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"updateGroup",
+						"{{domain_incomes}}",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateSubgroup",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Новое\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/updateSubgroup/{{domain_incomes}}/3",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"updateSubgroup",
+						"{{domain_incomes}}",
+						"3"
 					]
 				}
 			},
@@ -153,11 +269,23 @@
 		{
 			"key": "delete_id",
 			"value": "3",
-			"type": "string"
+			"type": "string",
+			"disabled": true
 		},
 		{
 			"key": "patch_id",
 			"value": "2",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "domain_incomes",
+			"value": "incomes",
+			"type": "string"
+		},
+		{
+			"key": "domain_expenses",
+			"value": "expenses",
 			"type": "string"
 		}
 	]
