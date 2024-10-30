@@ -1,28 +1,52 @@
-import { ExpensesResolver } from "./entity/expenses/resolver"
+import { TransactionsResolver } from "./resolvers"
 
 export const Routes = [
     {
         method: "get",
-        route: "/getExpenses",
-        controller: ExpensesResolver,
-        action: "getExpenses"
+        route: "/getTransactions/:domain",
+        controller: TransactionsResolver,
+        action: "getTransactionsByDomain",
     },
     {
         method: "post",
-        route: "/createExpense",
-        controller: ExpensesResolver,
-        action: "createExpense"
+        route: "/createTransaction/:domain",
+        controller: TransactionsResolver,
+        action: "createTransaction",
     },
     {
         method: "delete",
-        route: "/deleteExpense/:id",
-        controller: ExpensesResolver,
-        action: "deleteExpense"
+        route: "/deleteTransaction/:domain/:id",
+        controller: TransactionsResolver,
+        action: "deleteTransaction",
     },
     {
         method: "patch",
-        route: "/updateExpense/:id",
-        controller: ExpensesResolver,
-        action: "updateExpense"
+        route: "/updateTransaction/:domain/:id",
+        controller: TransactionsResolver,
+        action: "updateTransaction",
+    },
+    {
+        method: "get",
+        route: "/getGroups/:domain",
+        controller: TransactionsResolver,
+        action: "getGroups",
+    },
+    {
+        method: "patch",
+        route: "/updateGroup/:domain/:id",
+        controller: TransactionsResolver,
+        action: "updateGroup",
+    },
+    {
+        method: "get",
+        route: "/getSubgroups/:domain",
+        controller: TransactionsResolver,
+        action: "getSubgroups",
+    },
+    {
+        method: "patch",
+        route: "/updateSubgroup/:domain/:id",
+        controller: TransactionsResolver,
+        action: "updateSubgroup",
     },
 ]

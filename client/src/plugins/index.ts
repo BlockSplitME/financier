@@ -1,5 +1,5 @@
 /**
- * plugins/index.ts
+ * plugins/transactions.resolver.ts
  *
  * Automatically included in `./src/main.ts`
  */
