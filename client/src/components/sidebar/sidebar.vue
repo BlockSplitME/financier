@@ -19,14 +19,14 @@
 <script setup lang="ts">
   import { ROUTE_DIAGRAMS_PATH, ROUTE_HOME_PATH, ROUTE_TABLES_PATH }
 
- from '@/constants'
+    from '@/constants'
   import { ISidebarItem } from '@/types'
 
   const sidebarItems: ISidebarItem[] = [
     {
       route: ROUTE_HOME_PATH,
       icon: 'mdi-plus',
-      label: 'Добавить трату',
+      label: 'Добавить транзакцию',
     },
     {
       route: ROUTE_TABLES_PATH,

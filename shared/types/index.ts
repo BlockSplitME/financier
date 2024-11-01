@@ -1,4 +1,3 @@
-import {Group, Subgroup} from "../../server/src/entity";
 
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
@@ -7,8 +6,11 @@ type DeepPartial<T> = T extends object ? {
 export enum Domain {
     INCOMES = 'incomes',
     EXPENSES = 'expenses',
-    _GROUP = 'group',
-    _SUBGROUP = 'subgroup',
+}
+
+export enum GroupType {
+    GROUP = 'group',
+    SUBGROUP = 'subgroup',
 }
 
 export type TransactionGroupPayload = {
@@ -33,6 +35,15 @@ export type GetTransactionParams = {
     groupName?: string;
     subgroupName?: string;
 }
+
+export type Group = {
+    id: number;
+    name: string;
+    isIncome: boolean;
+    description?: string
+}
+
+export type Subgroup = Group;
 
 export type GetTransactionResult = Omit<CreateTransactionPayload, "group" | "subgroup"> & {
     id: number,

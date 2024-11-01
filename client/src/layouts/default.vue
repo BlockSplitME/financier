@@ -8,7 +8,6 @@
         </v-sheet>
       </v-container>
     </v-main>
-    <AppFooter />
   </v-app>
 </template>
 
@@ -29,7 +28,7 @@
 }
 
 .layout__block-sidebar {
-  width: 16em;
+  width: 18em;
 }
 
 .layout__block-page-content {

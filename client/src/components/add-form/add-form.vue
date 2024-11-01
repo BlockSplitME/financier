@@ -1,88 +1,111 @@
 <template>
   <form @submit.prevent="submit">
-    <v-text-field
-      v-model="name"
-      :error-messages="name"
-      label="Название"
-    />
-
-    <v-combobox
-      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-      label="Группа"
-    />
-
-    <v-combobox
-      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-      label="Подгруппа"
-    />
-
-    <v-text-field
-      v-model="description"
-      :error-messages="description"
-      label="Комментарий"
-    />
-
-    <v-text-field
-      v-model="sum"
-      label="Сумма"
-    />
-
-    <v-btn
-      class="me-4"
-      type="submit"
-    >
-      submit
-    </v-btn>
-
-    <v-btn @click="handleReset">
-      clear
-    </v-btn>
+    <v-container fluid>
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model="form.name"
+            label="Наименование"
+            variant="outlined"
+            width="400px"
+          />
+          <group-field v-model="form.group" :groups="groups" @fetch-group="fetchGroup" />
+          <group-field v-model="form.subgroup" :groups="subgroups" @fetch-group="fetchSubgroups" />
+        </v-col>
+        <v-col>
+          <v-date-picker
+            v-model="form.date"
+            elevation="5"
+            height="465px"
+            :max="maxDatePicker"
+            width="350px"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-textarea
+            v-model="form.description"
+            clearable
+            label="Комментарий"
+            no-resize
+            variant="outlined"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <SumField v-model="form.sum" />
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-btn
+            class="me-4"
+            type="submit"
+          >
+            submit
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-btn @click="handleReset">
+            clear
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
   </form>
 </template>
 
 <script setup lang="ts">
-  import { useForm }
+  import { CreateTransactionPayload, Domain, Group, Subgroup } from '@/types'
+  import { api } from '@/api'
+  import { formatDate } from '@/utils/format-date'
+  import GroupField from '@/components/add-form/components/group-field.vue'
 
- from 'vee-validate'
-  import * as yup from 'yup'
-  import { api }
-
- from '@/api'
-
-  const { defineField } = useForm({
-    validationSchema: yup.object({
-      name: yup.string().required(),
-      date: yup.date().required(),
-      group: yup.string().required(),
-      subgroup: yup.string().required(),
-      description: yup.string(),
-      sum: yup.number().required(),
-    }),
+  const props = defineProps({
+    domain: {
+      type: String,
+      required: true,
+    },
   })
 
-  const [name] = defineField('name')
-  const [date] = defineField('date')
-  const [group] = defineField('group')
-  const [subgroup] = defineField('subgroup')
-  const [description] = defineField('description')
-  const [sum] = defineField('sum')
+  const groups = ref<Group[]>([])
+  const subgroups = ref<Subgroup[]>([])
+
+  const maxDatePicker = formatDate.getDateForDatePicker(Date.now())
+
+  const form = ref<CreateTransactionPayload>({
+    name: '',
+    date: new Date(),
+    description: 'dsdsdsddssds',
+    group: {
+      name: '',
+      description: 'Описание',
+    },
+    subgroup: {
+      name: '',
+      description: 'Описание',
+    },
+    sum: 0,
+  })
+
+  const fetchGroup = async (name: string = '') => {
+    groups.value = await api.getGroupsByDomain(props.domain as Domain, { name })
+  }
+  const fetchSubgroups = async (name: string = '') => {
+    subgroups.value = await api.getSubgroupsByDomain(props.domain as Domain, { name })
+  }
 
   const submit = () => {
-    api.createExpense({
-      date: date.value,
-      description: description.value,
-      group: group.value,
-      name: name.value,
-      subgroup: subgroup.value,
-      sum: sum.value,
-    })
-  }
-
-  const handlereset = () => {
 
   }
+  const handleReset = () => {
+
+  }
+  onMounted(() => {
+    fetchGroup()
+    fetchSubgroups()
+  })
 </script>
 
 <style scoped lang="css">
-
 </style>
