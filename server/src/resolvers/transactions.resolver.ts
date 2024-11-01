@@ -6,7 +6,7 @@ import {
     CreateTransactionPayload,
     Domain,
     GetGroupParams,
-    GetTransactionParams, TransactionGroupPayload, UpdateGroupPayload,
+    GetTransactionParams, GroupType, TransactionGroupPayload, UpdateGroupPayload,
     UpdateTransactionPayload
 } from "../types";
 import {BadRequestError, InternalServerError, NotFoundError} from "../utils";
@@ -19,22 +19,22 @@ export class TransactionsResolver {
     private groupRepository = AppDataSource.getRepository(Group)
     private subgroupRepository = AppDataSource.getRepository(Subgroup)
 
-    private _selectRepository = (domain: Domain, next: NextFunction): Repository<any> => {
+    private _selectRepository = (domain: Domain | GroupType, next: NextFunction): Repository<any> => {
         switch(domain) {
             case Domain.INCOMES:
                 return this.incomesRepository
             case Domain.EXPENSES:
                 return this.expensesRepository
-            case Domain._GROUP:
+            case GroupType.GROUP:
                 return this.groupRepository
-            case Domain._SUBGROUP:
+            case GroupType.SUBGROUP:
                 return this.subgroupRepository
             default:
                 next(new BadRequestError("Передан неизвестный domain"));
         }
     }
-    private async _createGroup(domain: Domain, next: NextFunction, name: string, isIncome: boolean = false, description?: string ): Promise<Group> {
-        const repository = this._selectRepository(domain, next);
+    private async _createGroup(groupType: GroupType, next: NextFunction, name: string, isIncome: boolean = false, description?: string ): Promise<Group> {
+        const repository = this._selectRepository(groupType, next);
         try {
             const newItem = repository.create({
                 name,
@@ -45,11 +45,11 @@ export class TransactionsResolver {
 
             return newItem;
         } catch (error) {
-            next(new InternalServerError(`Ошибка создания новой ${domain}`));
+            next(new InternalServerError(`Ошибка создания новой ${groupType}`));
         }
     }
-    private async _getGroup(domain: Domain, next: NextFunction, name: string, isIncome: boolean): Promise<Group | undefined> {
-        const repository = this._selectRepository(domain, next);
+    private async _getGroup(groupType: GroupType, next: NextFunction, name: string, isIncome: boolean): Promise<Group | undefined> {
+        const repository = this._selectRepository(groupType, next);
         return await repository.findOne({ where: {name, isIncome}});
     }
     private async _getTransactionsByDomain(domain: Domain, params: GetTransactionParams, next: NextFunction) {
@@ -65,12 +65,12 @@ export class TransactionsResolver {
         }
         if (name) whereConditions.name = name as string;
         if (groupName) {
-            const group: Group = await this._getGroup(Domain._GROUP, next, groupName as string, isIncome);
+            const group: Group = await this._getGroup(GroupType.GROUP, next, groupName as string, isIncome);
             if(group) whereConditions.group = group;
             else next(new NotFoundError("Не найдена группа"));
         }
         if (subgroupName) {
-            const subgroup: Subgroup = await this._getGroup(Domain._SUBGROUP, next, subgroupName as string, isIncome);
+            const subgroup: Subgroup = await this._getGroup(GroupType.SUBGROUP, next, subgroupName as string, isIncome);
             if(subgroup) whereConditions.subgroup = subgroup;
             else next(new NotFoundError("Не найдена подгруппа"));
         }
@@ -96,8 +96,8 @@ export class TransactionsResolver {
         if (hasUndefinedField) {
             next(new BadRequestError('Не хватает необходимых полей.'))
         } else {
-            const group = await this._getGroup(Domain._GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(Domain._GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
-            const subgroup = await this._getGroup(Domain._SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(Domain._SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
+            const group = await this._getGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
+            const subgroup = await this._getGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
             if(group && subgroup) {
                 const newItem = repository.create(createTransactionPayload(requestBody, group, subgroup));
                 await repository.save(newItem);
@@ -129,10 +129,10 @@ export class TransactionsResolver {
         const isIncome = request.params.domain === Domain.INCOMES;
 
         if(requestBody.group) {
-            requestBody.group = await this._getGroup(Domain._GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(Domain._GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
+            requestBody.group = await this._getGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
         }
         if(requestBody.subgroup) {
-            requestBody.subgroup = await this._getGroup(Domain._SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(Domain._SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
+            requestBody.subgroup = await this._getGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
         }
         const isItemExists = await repository.exists({where:{id}});
         if(isItemExists) {
@@ -144,7 +144,7 @@ export class TransactionsResolver {
         }
     }
 
-    async getGroups(request: Request, response: Response, next: NextFunction, groupType: Domain = Domain._GROUP) {
+    async getGroups(request: Request, response: Response, next: NextFunction, groupType: GroupType = GroupType.GROUP) {
         const repository = this._selectRepository(groupType, next);
         const { name } = request.query as GetGroupParams;
 
@@ -163,9 +163,9 @@ export class TransactionsResolver {
         }
     }
     async getSubgroups(request: Request, response: Response, next: NextFunction) {
-        await this.getGroups(request, response, next, Domain._SUBGROUP);
+        await this.getGroups(request, response, next, GroupType.SUBGROUP);
     }
-    async updateGroup(request: Request, response: Response, next: NextFunction, groupType: Domain = Domain._GROUP) {
+    async updateGroup(request: Request, response: Response, next: NextFunction, groupType: GroupType = GroupType.GROUP) {
         const repository = this._selectRepository(groupType, next);
         const id = request.params.id;
         const requestBody: UpdateGroupPayload = request.body;
@@ -180,6 +180,6 @@ export class TransactionsResolver {
         }
     }
     async updateSubgroup(request: Request, response: Response, next: NextFunction) {
-        await this.updateGroup(request, response, next, Domain._SUBGROUP);
+        await this.updateGroup(request, response, next, GroupType.SUBGROUP);
     }
 }
