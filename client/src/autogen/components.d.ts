@@ -8,7 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddForm: typeof import('./../components/add-form/add-form.vue')['default']
+    'AddForm.consts': typeof import('./../components/add-form/add-form.consts.vue')['default']
     AppFooter: typeof import('./../components/appFooter.vue')['default']
+    DateField: typeof import('./../components/add-form/components/date-field.vue')['default']
+    DatePicker: typeof import('./../components/add-form/components/date-picker.vue')['default']
     GroupField: typeof import('./../components/add-form/components/group-field.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

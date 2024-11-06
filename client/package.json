@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.0.0",
   "scripts": {
-    "serve": "CLIENT_PORT=8080 SERVER_PORT=3000 vite",
+    "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -17,15 +17,17 @@
     "core-js": "^3.37.1",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
-    "vuetify": "^3.6.11",
+    "vuetify": "3.7.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/types": "^7.24.7",
+    "@date-io/date-fns": "^3.0.0",
     "@types/node": "^20.14.10",
     "@vee-validate/yup": "^4.14.6",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-typescript": "^13.0.0",
+    "date-fns": "^3.6.0",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-config-vuetify": "^1.0.0",

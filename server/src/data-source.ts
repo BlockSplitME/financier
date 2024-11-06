@@ -9,5 +9,5 @@ export const AppDataSource = new DataSource({
     migrations: [],
     subscribers: [],
     // Для первоначального создания дб - true, при имеющейся дб - false;
-    synchronize: false,
+    synchronize: !(process.env.IS_DB_EXISTS === 'true'),
 })

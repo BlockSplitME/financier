@@ -1,4 +1,3 @@
-
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
@@ -11,6 +10,10 @@ export enum Domain {
 export enum GroupType {
     GROUP = 'group',
     SUBGROUP = 'subgroup',
+}
+
+export enum CONSTANTS {
+    DEFAULT_GROUP_NAME = 'не выбрана'
 }
 
 export type TransactionGroupPayload = {

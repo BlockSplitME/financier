@@ -13,6 +13,6 @@ export class Group {
     @Column({ nullable: false, default: false })
     isIncome: boolean
 
-    @Column()
+    @Column({nullable: true})
     description: string
 }

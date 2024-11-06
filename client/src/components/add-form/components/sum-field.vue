@@ -1,7 +1,7 @@
 <template>
   <v-col>
     <v-text-field
-      v-model="sum"
+      v-model.number="sum"
       hide-spin-buttons
       label="Сумма"
       type="number"
@@ -13,8 +13,8 @@
     <v-slider
       v-model="sum"
       :color="sliderColor"
-      max="5000"
-      min="0"
+      :max="5000"
+      :min="0"
       :step="1"
       track-color="grey"
     >
@@ -60,8 +60,8 @@
   })
 
   const validateNumber = () => {
-    if (sum.value < 0) sum.value = 0
     sum.value = Number(sum.value)
+    if (sum.value < 0) sum.value = 0
   }
   const sliderDecrement = () => {
     if (sum.value) sum.value -= 1

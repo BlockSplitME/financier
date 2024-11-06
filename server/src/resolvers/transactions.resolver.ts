@@ -33,19 +33,22 @@ export class TransactionsResolver {
                 next(new BadRequestError("Передан неизвестный domain"));
         }
     }
-    private async _createGroup(groupType: GroupType, next: NextFunction, name: string, isIncome: boolean = false, description?: string ): Promise<Group> {
+    private async _createGroup(groupType: GroupType, next: NextFunction, name?: string, isIncome: boolean = false, description?: string ): Promise<Group> {
         const repository = this._selectRepository(groupType, next);
-        try {
-            const newItem = repository.create({
-                name,
-                description: description || '',
-                isIncome,
-            });
-            await repository.save(newItem);
+        if(!name && !name.trim()) next(new BadRequestError(`Передана ${groupType} без имени`));
+        else {
+            try {
+                const newItem = repository.create({
+                    name: name.toLowerCase().trim(),
+                    description: description || '',
+                    isIncome,
+                });
+                await repository.save(newItem);
 
-            return newItem;
-        } catch (error) {
-            next(new InternalServerError(`Ошибка создания новой ${groupType}`));
+                return newItem;
+            } catch (error) {
+                next(new InternalServerError(`Ошибка создания новой ${groupType}`));
+            }
         }
     }
     private async _getGroup(groupType: GroupType, next: NextFunction, name: string, isIncome: boolean): Promise<Group | undefined> {
@@ -90,12 +93,12 @@ export class TransactionsResolver {
         const requestBody: CreateTransactionPayload = request.body;
         const isIncome = request.params.domain === Domain.INCOMES;
 
-        //TODO: Проверить на работоспособность
-        const hasUndefinedField = Object.values(requestBody).some(value => value === undefined);
-
-        if (hasUndefinedField) {
-            next(new BadRequestError('Не хватает необходимых полей.'))
-        } else {
+        const isCorrectInputData = Boolean(
+            requestBody.name &&
+            requestBody.name.trim() &&
+            requestBody.date &&
+            requestBody.sum >= 0);
+        if (isCorrectInputData) {
             const group = await this._getGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
             const subgroup = await this._getGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
             if(group && subgroup) {
@@ -109,6 +112,8 @@ export class TransactionsResolver {
                     response.status(201).json(getTransactionsData(data))
                 }
             }
+        } else {
+            next(new BadRequestError('Не хватает необходимых полей.'))
         }
     }
     async deleteTransaction(request: Request, response: Response, next: NextFunction) {
@@ -146,16 +151,17 @@ export class TransactionsResolver {
 
     async getGroups(request: Request, response: Response, next: NextFunction, groupType: GroupType = GroupType.GROUP) {
         const repository = this._selectRepository(groupType, next);
+        const queryBuilder = repository.createQueryBuilder("group");
+
         const { name } = request.query as GetGroupParams;
 
-        const whereConditions =  {
-            isIncome: request.params.domain === Domain.INCOMES,
-        } as FindOptionsWhere<Group>;
-
-        if(name) {
-            whereConditions.name = Like(`${name}%`);
+        queryBuilder.andWhere("group.isIncome = :isIncome", { isIncome: request.params.domain === Domain.INCOMES})
+        if (name) {
+            queryBuilder.andWhere("group.name LIKE :name", { name: `${name.toLowerCase().trim()}%` });
         }
-        const data = await repository.find({where: whereConditions});
+
+        const data = await queryBuilder.getMany();
+
         if(data.length === 0) {
             response.status(404).json([]);
         } else {

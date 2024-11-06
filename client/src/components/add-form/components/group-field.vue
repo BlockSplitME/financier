@@ -1,48 +1,46 @@
 <template>
   <v-combobox
     v-model="group.name"
+    :class="`group-field__input-name-${label}`"
+    clearable
     :items="groupsNames"
-    label="Группа"
+    :label="label"
+    :placeholder="CONSTANTS.DEFAULT_GROUP_NAME"
     variant="outlined"
-    @update:search="fetchGroup"
+    @update:focused="onFocusedNameField"
+    @update:search="updateSearch"
   />
 
   <v-textarea
     ref="textarea"
     v-model="group.description"
-    :class="[
-      {
-        'test': isGroupDescriptionReadonly
-      }
-    ]"
-    label="Описание группы"
+    :disabled="!isGroupNameNotEmpty"
+    label="Описание"
     no-resize
     :readonly="isGroupDescriptionReadonly"
     rows="3"
     variant="outlined"
     @update:focused="onFocusedDescriptionField"
   >
-    <template #append-inner />
+    <template #append-inner>
+      <v-btn
+        v-if="isGroupDescriptionReadonly && isGroupNameNotEmpty"
+        class="group-field__description-edit-btn"
+        icon="mdi-pencil-outline"
+        size="small"
+        variant="text"
+        @click="activatedEditDescription"
+      />
+    </template>
   </v-textarea>
-
-  <Teleport v-if="textarea" to="textarea">
-    <v-btn
-      v-if="isGroupDescriptionReadonly"
-      class="group-field__description-edit-btn modal"
-      icon="mdi-pencil-outline"
-      size="small"
-      variant="text"
-      @click="activatedEditDescription"
-    />
-  </Teleport>
 </template>
 
 <script setup lang="ts">
   import { PropType } from 'vue'
-  import { Group, TransactionGroupPayload } from '@/types'
+  import { CONSTANTS, Group, TransactionGroupPayload } from '@/types'
 
   const group = defineModel<TransactionGroupPayload>('modelValue', {
-    type: Object as PropType<TransactionGroupPayload>,
+    type: Object as PropType<TransactionGroupPayload> | null,
     required: true,
   })
 
@@ -51,12 +49,29 @@
       type: Array as PropType<Group[]>,
       default: () => [] as Group[],
     },
+    label: String,
   })
 
   const emits = defineEmits<{ fetchGroup: []}>()
-  const groupsNames = computed<string[]>(() => props.groups.map(group => group.name))
+
   const isGroupDescriptionReadonly = ref<boolean>(true)
   const textarea = ref()
+
+  const groupsNames = computed<string[]>(() => props.groups.filter(group => group.name !== CONSTANTS.DEFAULT_GROUP_NAME).map(group => group.name))
+  const isGroupNameNotEmpty = computed<boolean>(() => Boolean((group.value.name ?? '').trim()) && group.value.name.trim() !== CONSTANTS.DEFAULT_GROUP_NAME)
+
+  const onFocusedNameField = (focused: boolean) => {
+    if (!focused) {
+      if (!group.value.name || !(group.value.name.trim())) {
+        group.value.name = CONSTANTS.DEFAULT_GROUP_NAME
+      }
+    }
+  }
+  const clearInput = () => {
+    if (group.value.name.trim() === CONSTANTS.DEFAULT_GROUP_NAME) {
+      group.value.name = ''
+    }
+  }
 
   const onFocusedDescriptionField = (focused: boolean) => {
     if (!isGroupDescriptionReadonly.value) isGroupDescriptionReadonly.value = !focused
@@ -65,25 +80,18 @@
     isGroupDescriptionReadonly.value = false
     textarea.value.focus()
   }
-  const fetchGroup = () => {
+  const updateSearch = () => {
     emits('fetchGroup')
   }
+
+  onMounted(() => {
+    document.querySelector(`.group-field__input-name-${props.label} > .v-input__control `)?.addEventListener('click', clearInput)
+  })
 </script>
 
 <style scoped lang="css">
 .group-field__description-edit-btn {
- --textarea-enclosed-text-slot-padding: 12px;
-  right: -10px
-}
-textarea {
-  background-color: red;
-}
-.modal {
-  position: fixed;
-  z-index: 999;
-  top: 20%;
-  left: 50%;
-  width: 300px;
-  margin-left: -150px;
+  right: -10px;
+  top: -15px;
 }
 </style>
