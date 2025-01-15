@@ -7,11 +7,12 @@
       type="number"
       variant="outlined"
       @input="validateNumber"
+      @keydown.delete="deleteNumber"
     />
   </v-col>
   <v-col align-self="center">
     <v-slider
-      v-model="sum"
+      v-model.number="sum"
       :color="sliderColor"
       :max="5000"
       :min="0"
@@ -59,8 +60,14 @@
     return '#fa3434'
   })
 
+  const deleteNumber = (event: Event) => {
+    if (sum.value < 10) {
+      event.preventDefault()
+      sum.value = 0
+    }
+  }
   const validateNumber = () => {
-    sum.value = Number(sum.value)
+    sum.value = Number(sum.value) ?? 0
     if (sum.value < 0) sum.value = 0
   }
   const sliderDecrement = () => {

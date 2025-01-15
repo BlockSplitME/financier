@@ -1,16 +1,17 @@
 import {AppDataSource} from "../data-source"
 import {NextFunction, Request, Response} from "express"
 import {Expenses, Group, Incomes, Subgroup} from "../entity"
-import {Between, FindOptionsWhere, Like, Repository} from "typeorm";
+import { Repository} from "typeorm";
 import {
+    CONSTANTS,
     CreateTransactionPayload,
     Domain,
     GetGroupParams,
-    GetTransactionParams, GroupType, TransactionGroupPayload, UpdateGroupPayload,
+    GetTransactionParams, GetTransactionsResult, GroupType, UpdateGroupPayload,
     UpdateTransactionPayload
 } from "../types";
 import {BadRequestError, InternalServerError, NotFoundError} from "../utils";
-import {createTransactionPayload, getTransactionsData} from "../adapter";
+import { transactionAdapter } from "../adapter";
 
 export class TransactionsResolver {
 
@@ -55,37 +56,79 @@ export class TransactionsResolver {
         const repository = this._selectRepository(groupType, next);
         return await repository.findOne({ where: {name, isIncome}});
     }
-    private async _getTransactionsByDomain(domain: Domain, params: GetTransactionParams, next: NextFunction) {
+    private async _getTransactionsByDomain(domain: Domain, params: GetTransactionParams, next: NextFunction): Promise<GetTransactionsResult> {
         const repository = this._selectRepository(domain, next);
+        const queryBuilder = repository.createQueryBuilder("transaction");
         const isIncome = domain === Domain.INCOMES;
 
-        const whereConditions =  {} as FindOptionsWhere<Expenses>;
-        const { id, start_timestamp, end_timestamp, name, groupName, subgroupName} = params;
+        const {
+            id,
+            start_date,
+            end_date,
+            name,
+            groupName,
+            subgroupName,
+            offset,
+            rowCount,
+            sortBy,
+            sortOrder,
+            sortNulls
+        } = params;
 
-        if (id) whereConditions.id = Number(id);
-        if (start_timestamp || end_timestamp) {
-            whereConditions.date = Between<Date>(start_timestamp ? new Date(start_timestamp as string) : new Date(0), end_timestamp ? new Date(end_timestamp as string) : new Date());
+        if (id) {
+            queryBuilder.andWhere("transaction.id = :id", { id: Number(id)})
         }
-        if (name) whereConditions.name = name as string;
+        if (start_date || end_date) {
+            queryBuilder.andWhere("transaction.date BETWEEN :startDate AND :endDate", { start_date: start_date ? new Date(start_date as string) : new Date(0), end_date: end_date ? new Date(end_date as string) : new Date() })
+        }
+        if (name) {
+            queryBuilder.andWhere("transaction.name = :name", { name })
+        }
         if (groupName) {
             const group: Group = await this._getGroup(GroupType.GROUP, next, groupName as string, isIncome);
-            if(group) whereConditions.group = group;
-            else next(new NotFoundError("Не найдена группа"));
+            if(group) {
+                queryBuilder.andWhere("transaction.group = :group", { group })
+            } else next(new NotFoundError("Не найдена группа"));
         }
         if (subgroupName) {
             const subgroup: Subgroup = await this._getGroup(GroupType.SUBGROUP, next, subgroupName as string, isIncome);
-            if(subgroup) whereConditions.subgroup = subgroup;
-            else next(new NotFoundError("Не найдена подгруппа"));
+            if(subgroup) {
+                queryBuilder.andWhere("transaction.subgroup = :subgroup", { subgroup })
+            } else next(new NotFoundError("Не найдена подгруппа"));
         }
-        return await repository.find({where: whereConditions, relations: ['group', 'subgroup']});
+
+        const totalRows = await queryBuilder.getCount();
+        const skip = Number(offset ?? 0);
+
+        queryBuilder.leftJoinAndSelect("transaction.group", "group")
+        queryBuilder.leftJoinAndSelect("transaction.subgroup", "subgroup")
+        queryBuilder
+            .skip(Number(offset ?? 0))
+            .take(Number(rowCount ?? CONSTANTS.DEFAULT_ROW_COUNT))
+
+        if(sortBy) {
+            queryBuilder.orderBy(`transaction.${sortBy}`, sortOrder, sortNulls)
+        }
+
+        const data = await queryBuilder.getMany()
+        return {
+            data,
+            meta: {
+                pagination: {
+                    offset: skip,
+                    rowCount: data.length,
+                    totalRows
+                }
+            }
+        }
     }
 
     async getTransactionsByDomain(request: Request, response: Response, next: NextFunction) {
         const data = await this._getTransactionsByDomain(request.params.domain as Domain, request.query as GetTransactionParams, next);
-        if(data.length === 0) {
-            response.status(404).json([]);
+        if(!data) {
+            response.status(404).json({ data: []});
         } else {
-            response.status(200).json(data.map((item) => getTransactionsData(item)));
+            response.status(200).json(data);
         }
     }
     async createTransaction(request: Request, response: Response, next: NextFunction) {
@@ -102,14 +145,14 @@ export class TransactionsResolver {
             const group = await this._getGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
             const subgroup = await this._getGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
             if(group && subgroup) {
-                const newItem = repository.create(createTransactionPayload(requestBody, group, subgroup));
+                const newItem = repository.create(transactionAdapter.createTransactionPayload(requestBody, group, subgroup));
                 await repository.save(newItem);
 
                 const data = await repository.findOne({where: {id: newItem.id}, relations: ['group', 'subgroup']});
                 if(!data) {
                     next(new InternalServerError("Ошибка сохранения"))
                 } else {
-                    response.status(201).json(getTransactionsData(data))
+                    response.status(201).json(transactionAdapter.getTransactionData(data))
                 }
             }
         } else {
@@ -143,7 +186,7 @@ export class TransactionsResolver {
         if(isItemExists) {
             await repository.update({id: Number(id)}, requestBody);
             const data = await repository.findOne({where: {id}, relations: ['group', 'subgroup']});
-            response.status(200).json(getTransactionsData(data))
+            response.status(200).json(transactionAdapter.getTransactionData(data))
         } else {
             next(new BadRequestError(`Не существует элемента по id=${id}`))
         }
@@ -153,11 +196,29 @@ export class TransactionsResolver {
         const repository = this._selectRepository(groupType, next);
         const queryBuilder = repository.createQueryBuilder("group");
 
-        const { name } = request.query as GetGroupParams;
+        const {
+            name,
+            offset,
+            rowCount,
+            sortBy,
+            sortOrder,
+            sortNulls
+        } = request.query as GetGroupParams;
 
         queryBuilder.andWhere("group.isIncome = :isIncome", { isIncome: request.params.domain === Domain.INCOMES})
         if (name) {
             queryBuilder.andWhere("group.name LIKE :name", { name: `${name.toLowerCase().trim()}%` });
+        }
+
+        const totalRows = await queryBuilder.getCount();
+        const skip = Number(offset ?? 0);
+
+        queryBuilder
+            .skip(Number(offset ?? 0))
+            .take(Number(rowCount ?? CONSTANTS.DEFAULT_ROW_COUNT))
+
+        if(sortBy) {
+            queryBuilder.orderBy(`group.${sortBy}`, sortOrder, sortNulls)
         }
 
         const data = await queryBuilder.getMany();
@@ -165,7 +226,16 @@ export class TransactionsResolver {
         if(data.length === 0) {
             response.status(404).json([]);
         } else {
-            response.status(200).json(data);
+            response.status(200).json({
+                data,
+                meta: {
+                    pagination: {
+                        offset: skip,
+                        rowCount: data.length,
+                        totalRows
+                    }
+                }
+            });
         }
     }
     async getSubgroups(request: Request, response: Response, next: NextFunction) {

@@ -2,10 +2,10 @@
   <v-combobox
     v-model="group.name"
     :class="`group-field__input-name-${label}`"
-    clearable
+    :clearable="!isGroupNameEmpty"
     :items="groupsNames"
     :label="label"
-    :placeholder="CONSTANTS.DEFAULT_GROUP_NAME"
+    :placeholder="CONSTANTS.DEFAULT_GROUP_NAME as string"
     variant="outlined"
     @update:focused="onFocusedNameField"
     @update:search="updateSearch"
@@ -14,7 +14,7 @@
   <v-textarea
     ref="textarea"
     v-model="group.description"
-    :disabled="!isGroupNameNotEmpty"
+    :disabled="!isGroupNameChosen"
     label="Описание"
     no-resize
     :readonly="isGroupDescriptionReadonly"
@@ -24,7 +24,7 @@
   >
     <template #append-inner>
       <v-btn
-        v-if="isGroupDescriptionReadonly && isGroupNameNotEmpty"
+        v-if="isGroupDescriptionReadonly && isGroupNameChosen"
         class="group-field__description-edit-btn"
         icon="mdi-pencil-outline"
         size="small"
@@ -37,17 +37,17 @@
 
 <script setup lang="ts">
   import { PropType } from 'vue'
-  import { CONSTANTS, Group, TransactionGroupPayload } from '@/types'
+  import { CONSTANTS, TableGroupItemData, TransactionGroupPayload } from '@/types'
 
   const group = defineModel<TransactionGroupPayload>('modelValue', {
-    type: Object as PropType<TransactionGroupPayload> | null,
+    type: Object as PropType<TransactionGroupPayload>,
     required: true,
   })
 
   const props = defineProps({
     groups: {
-      type: Array as PropType<Group[]>,
-      default: () => [] as Group[],
+      type: Array as PropType<TableGroupItemData[]>,
+      default: () => [] as TableGroupItemData[],
     },
     label: String,
   })
@@ -58,7 +58,8 @@
   const textarea = ref()
 
   const groupsNames = computed<string[]>(() => props.groups.filter(group => group.name !== CONSTANTS.DEFAULT_GROUP_NAME).map(group => group.name))
-  const isGroupNameNotEmpty = computed<boolean>(() => Boolean((group.value.name ?? '').trim()) && group.value.name.trim() !== CONSTANTS.DEFAULT_GROUP_NAME)
+  const isGroupNameEmpty = computed<boolean>(() => Boolean(!(group.value.name ?? '').trim()))
+  const isGroupNameChosen = computed<boolean>(() => !isGroupNameEmpty.value && group.value.name.trim() !== CONSTANTS.DEFAULT_GROUP_NAME)
 
   const onFocusedNameField = (focused: boolean) => {
     if (!focused) {
@@ -68,7 +69,7 @@
     }
   }
   const clearInput = () => {
-    if (group.value.name.trim() === CONSTANTS.DEFAULT_GROUP_NAME) {
+    if (group.value.name && group.value.name.trim() === CONSTANTS.DEFAULT_GROUP_NAME) {
       group.value.name = ''
     }
   }

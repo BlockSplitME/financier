@@ -8,15 +8,19 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddForm: typeof import('./../components/add-form/add-form.vue')['default']
-    'AddForm.consts': typeof import('./../components/add-form/add-form.consts.vue')['default']
     AppFooter: typeof import('./../components/appFooter.vue')['default']
     DateField: typeof import('./../components/add-form/components/date-field.vue')['default']
     DatePicker: typeof import('./../components/add-form/components/date-picker.vue')['default']
+    DomainsTabs: typeof import('./../components/domains-tabs/domains-tabs.vue')['default']
+    DomainsTabsTemplate: typeof import('@/components/domains-tabs/domains-tabs.vue')['default']
     GroupField: typeof import('./../components/add-form/components/group-field.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchGroup: typeof import('./../components/add-form/components/search-group.vue')['default']
     Sidebar: typeof import('./../components/sidebar/sidebar.vue')['default']
     SumField: typeof import('./../components/add-form/components/sum-field.vue')['default']
+    Table: typeof import('@/components/tables/tables.vue')['default']
+    Tables: typeof import('./../components/tables/tables.vue')['default']
+    TransactionTable: typeof import('@/components/tables/tables.vue')['default']
   }
 }

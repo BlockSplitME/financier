@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-  import { CONSTANTS, CreateTransactionPayload, Domain, Group, TransactionGroupPayload } from '@/types'
+  import { CONSTANTS, CreateTransactionPayload, Domain, TableGroupItemData, TransactionGroupPayload } from '@/types'
   import { api } from '@/api'
   import DateField from '@/components/add-form/components/date-field.vue'
 
@@ -59,8 +59,8 @@
   })
 
   const formRef = ref()
-  const groups = ref<Group[]>([])
-  const subgroups = ref<Group[]>([])
+  const groups = ref<TableGroupItemData[]>([])
+  const subgroups = ref<TableGroupItemData[]>([])
 
   const form = ref<CreateTransactionPayload>({
     name: '',
@@ -78,14 +78,20 @@
   })
 
   const fetchGroup = async () => {
-    groups.value = await api.getGroupsByDomain(props.domain as Domain, { name: form.value.group.name ?? '' })
-    setGroupDescriptionByName(groups.value, form.value.group)
+    // TODO: Нет пагинации
+    try {
+      groups.value = (await api.getGroupsByDomain(props.domain as Domain, { name: form.value.group.name ?? '' })).items
+      setGroupDescriptionByName(groups.value, form.value.group)
+    } catch {}
   }
   const fetchSubgroups = async () => {
-    subgroups.value = await api.getSubgroupsByDomain(props.domain as Domain, { name: form.value.subgroup.name ?? '' })
-    setGroupDescriptionByName(subgroups.value, form.value.subgroup)
+    // TODO: Нет пагинации
+    try {
+      subgroups.value = (await api.getSubgroupsByDomain(props.domain as Domain, { name: form.value.subgroup.name ?? '' })).items
+      setGroupDescriptionByName(subgroups.value, form.value.subgroup)
+    } catch {}
   }
-  const setGroupDescriptionByName = (groups: Group[], formGroup: TransactionGroupPayload) => {
+  const setGroupDescriptionByName = (groups: TableGroupItemData[], formGroup: TransactionGroupPayload) => {
     formGroup.description = groups.find(group => group.name === formGroup.name)?.description
   }
 
@@ -98,11 +104,11 @@
       date: form.value.date,
       description: '',
       group: {
-        name: '',
+        name: CONSTANTS.DEFAULT_GROUP_NAME as string,
         description: '',
       },
       subgroup: {
-        name: '',
+        name: CONSTANTS.DEFAULT_GROUP_NAME as string,
         description: '',
       },
       sum: 0,
