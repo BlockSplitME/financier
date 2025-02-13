@@ -30,7 +30,7 @@
     },
     {
       route: ROUTE_TABLES_PATH,
-      icon: 'mdi-table',
+      icon: 'mdi-tables',
       label: 'Таблицы',
     },
     {

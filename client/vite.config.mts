@@ -33,6 +33,7 @@ export default defineConfig({
     }),
     Components({
       dts: 'src/autogen/components.d.ts',
+      inject: ['vue'],
     }),
     Vue({
       template: { transformAssetUrls },
