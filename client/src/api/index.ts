@@ -9,7 +9,6 @@ import {
   TableGroupData,
   TableTransactionData,
   UpdateGroupPayload,
-  UpdateTransactionPayload,
 } from "@/types";
 import { groupAdapter, transactionAdapter } from "@/adapters";
 import axios from "axios";

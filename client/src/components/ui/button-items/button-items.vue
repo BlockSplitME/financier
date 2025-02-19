@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex ga-4">
     <v-btn
-      v-for="(option, index) in options"
+      v-for="option in options"
       :text="option.label"
       :color="option.color"
       :loading="option.isLoading"

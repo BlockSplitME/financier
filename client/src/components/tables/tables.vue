@@ -105,7 +105,7 @@ const totalItems = computed<number>(
   () => tablePagination.value?.totalRows || 0
 );
 
-const parseDate = (date: string) => formatDate.getDateForTable(date);
+const parseDate = (date: string | Date) => formatDate.getDateForTable(date);
 
 const changeTable = () => {
   fetchTablesItems({ page: 1, itemsPerPage: itemsPerPage.value });

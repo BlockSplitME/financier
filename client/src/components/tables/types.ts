@@ -33,7 +33,7 @@ export type TableGroupItemData = {
 
 export type TableTransactionItemData = {
   id: number;
-  date: string;
+  date: Date;
   name: string;
   group: TransactionGroupPayload;
   subgroup: TransactionGroupPayload;
