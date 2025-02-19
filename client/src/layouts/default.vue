@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <v-main class="d-flex flex-row layout__block-main ">
+    <v-main class="d-flex flex-row layout__block-main">
       <Sidebar class="d-flex flex-column layout__block layout__block-sidebar" />
       <v-container class="pa-0" fluid>
-        <v-sheet class="layout__block layout__block-page-content ">
+        <v-sheet class="layout__block layout__block-page-content">
           <router-view />
         </v-sheet>
       </v-container>
@@ -11,8 +11,7 @@
   </v-app>
 </template>
 
-<script lang="ts" setup>
-</script>
+<script lang="ts" setup></script>
 
 <style scoped>
 .layout__block {

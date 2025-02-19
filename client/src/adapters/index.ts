@@ -1,1 +1,1 @@
-export * from '@/adapters/tables'
+export * from "@/adapters/tables";

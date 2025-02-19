@@ -1,9 +1,5 @@
 <template>
-  <v-tabs
-    v-model="tab"
-    align-tabs="start"
-    class="pl-1"
-  >
+  <v-tabs v-model="tab" align-tabs="start" class="pl-1">
     <v-tab
       v-for="(item, i) in DOMAIN_TABS"
       :key="i"
@@ -26,18 +22,16 @@
 </template>
 
 <script setup lang="ts">
-  import { DOMAIN_TABS } from '@/constants'
+import { DOMAIN_TABS } from "@/constants";
 
-  defineProps({
-    component: {
-      type: Object,
-      required: true,
-    },
-  })
+defineProps({
+  component: {
+    type: Object,
+    required: true,
+  },
+});
 
-  const tab = ref()
+const tab = ref();
 </script>
 
-<style scoped lang="css">
-
-</style>
+<style scoped lang="css"></style>

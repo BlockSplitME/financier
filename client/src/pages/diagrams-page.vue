@@ -1,11 +1,5 @@
-<template>
-  Диаграмма
-</template>
+<template>Диаграмма</template>
 
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<style scoped lang="css">
-
-</style>
+<style scoped lang="css"></style>

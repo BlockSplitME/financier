@@ -1,81 +1,110 @@
-import { SERVER_URL } from '@/constants'
+import { SERVER_URL } from "@/constants";
 import {
   CreateTransactionPayload,
   Domain,
-  GetGroupParams, GetGroupResult, GetTransactionData,
-  GetTransactionParams, GetTransactionsResult, Group, TableGroupData, TableTransactionData, UpdateGroupPayload,
+  GetGroupParams,
+  GetGroupResult,
+  GetTransactionParams,
+  GetTransactionsResult,
+  TableGroupData,
+  TableTransactionData,
+  UpdateGroupPayload,
   UpdateTransactionPayload,
-} from '@/types'
-import { groupAdapter, transactionAdapter } from '@/adapters'
+} from "@/types";
+import { groupAdapter, transactionAdapter } from "@/adapters";
+import axios from "axios";
 
 export const api = {
-  async getTransactionsByDomain (domain: Domain, query?: GetTransactionParams): Promise<TableTransactionData> {
-    const data = await fetch(`${SERVER_URL}/getTransactions/${domain}?${
-      new URLSearchParams(query).toString()}`,
-    { method: 'GET' })
-      .then(res => res.json())
-      .catch(() => (
-        {
-          data: [] as GetTransactionData[],
-        }
-      ))
-    return transactionAdapter(data as GetTransactionsResult)
+  async getTransactionsByDomain(
+    domain: Domain,
+    query?: GetTransactionParams
+  ): Promise<TableTransactionData> {
+    const { data } = await axios.get(
+      `${SERVER_URL}/getTransactions/${domain}?${new URLSearchParams(
+        query
+      ).toString()}`
+    );
+    return transactionAdapter(data as GetTransactionsResult);
   },
-  async createTransaction (domain: Domain, payload: CreateTransactionPayload) {
-    await fetch(`${SERVER_URL}/createTransaction/${domain}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    }).then(res => res.json())
-  },
-  async deleteTransactionById (domain: Domain, id: number) {
-    await fetch(`${SERVER_URL}/deleteTransaction/${domain}/${id}`, { method: 'DELETE' })
-  },
-  async updateTransaction (domain: Domain, id: number, payload: UpdateTransactionPayload) {
-    await fetch(`${SERVER_URL}/updateTransaction/${domain}/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-  },
-  async getGroupsByDomain (domain: Domain, query?: GetGroupParams): Promise<TableGroupData> {
-    const data: GetGroupResult = await fetch(`${SERVER_URL}/getGroups/${domain}?${
-      new URLSearchParams(query).toString()}`, { method: 'GET' }).then(res => res.json()).catch(() => (
+  async createTransaction(domain: Domain, payload: CreateTransactionPayload) {
+    await axios.post(
+      `${SERVER_URL}/createTransaction/${domain}`,
+      JSON.stringify(payload),
       {
-        data: [] as Group[],
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    ))
-    return groupAdapter(data)
+    );
   },
-  async updateGroupDescription (domain: Domain, id: number, payload: UpdateGroupPayload) {
-    await fetch(`${SERVER_URL}/updateGroup/${domain}/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+  async deleteTransactionById(domain: Domain, id: number) {
+    await axios.delete(`${SERVER_URL}/deleteTransaction/${domain}/${id}`);
   },
-  async getSubgroupsByDomain (domain: Domain, query?: GetGroupParams): Promise<TableGroupData> {
-    const data = await fetch(`${SERVER_URL}/getSubgroups/${domain}?${
-      new URLSearchParams(query).toString()}`, { method: 'GET' }).then(res => res.json()).catch(() => (
+  async updateTransaction(
+    domain: Domain,
+    id: number,
+    payload: CreateTransactionPayload
+  ) {
+    await axios.patch(
+      `${SERVER_URL}/updateTransaction/${domain}/${id}`,
+      JSON.stringify(payload),
       {
-        data: [] as Group[],
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    ))
-    return groupAdapter(data as GetGroupResult)
+    );
   },
-  async updateSubgroupsDescription (domain: Domain, id: number, payload: UpdateGroupPayload) {
-    await fetch(`${SERVER_URL}/updateSubgroups/${domain}/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+  async getGroupsByDomain(
+    domain: Domain,
+    query?: GetGroupParams
+  ): Promise<TableGroupData> {
+    const { data } = await axios.get(
+      `${SERVER_URL}/getGroups/${domain}?${new URLSearchParams(
+        query
+      ).toString()}`
+    );
+    return groupAdapter(data);
   },
-}
+  async updateGroupDescription(
+    domain: Domain,
+    id: number,
+    payload: UpdateGroupPayload
+  ) {
+    await axios.patch(
+      `${SERVER_URL}/updateGroup/${domain}/${id}`,
+      JSON.stringify(payload),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  },
+  async getSubgroupsByDomain(
+    domain: Domain,
+    query?: GetGroupParams
+  ): Promise<TableGroupData> {
+    const { data } = await axios.get(
+      `${SERVER_URL}/getSubgroups/${domain}?${new URLSearchParams(
+        query
+      ).toString()}`
+    );
+    return groupAdapter(data as GetGroupResult);
+  },
+  async updateSubgroupsDescription(
+    domain: Domain,
+    id: number,
+    payload: UpdateGroupPayload
+  ) {
+    await axios.patch(
+      `${SERVER_URL}/updateSubgroups/${domain}/${id}`,
+      JSON.stringify(payload),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  },
+};

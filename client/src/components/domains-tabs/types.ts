@@ -1,8 +1,8 @@
-import { Domain } from '@/types'
+import { Domain } from "@/types";
 
 export type TabsParams = {
-  value: Domain,
-  label: string,
-  color: string,
-  transition: boolean,
-}
+  value: Domain;
+  label: string;
+  color: string;
+  transition: boolean;
+};

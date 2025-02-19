@@ -1,11 +1,9 @@
 <template>
-  <DomainsTabs :component="AddForm" />
+  <DomainsTabs :component="TransactionForm" />
 </template>
 
 <script setup lang="ts">
-  import AddForm from '@/components/add-form/add-form.vue'
+import TransactionForm from "@/components/transaction-form/transaction-form.vue";
 </script>
 
-<style scoped lang="css">
-
-</style>
+<style scoped lang="css"></style>

@@ -7,20 +7,25 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AddForm: typeof import('./../components/add-form/add-form.vue')['default']
+    AddForm: typeof import('@/components/transaction-form/transaction-form.vue')['default']
     AppFooter: typeof import('./../components/appFooter.vue')['default']
-    DateField: typeof import('./../components/add-form/components/date-field.vue')['default']
-    DatePicker: typeof import('./../components/add-form/components/date-picker.vue')['default']
+    ButtonItems: typeof import('./../components/ui/button-items/button-items.vue')['default']
+    DateField: typeof import('./../components/transaction-form/components/date-field.vue')['default']
+    DatePicker: typeof import('@/components/transaction-form/components/date-picker.vue')['default']
     DomainsTabs: typeof import('./../components/domains-tabs/domains-tabs.vue')['default']
     DomainsTabsTemplate: typeof import('@/components/domains-tabs/domains-tabs.vue')['default']
-    GroupField: typeof import('./../components/add-form/components/group-field.vue')['default']
+    Form: typeof import('./../components/transaction-form/form.vue')['default']
+    FormActions: typeof import('@/components/ui/button-items/button-items.vue')['default']
+    GroupField: typeof import('./../components/transaction-form/components/group-field.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SearchGroup: typeof import('./../components/add-form/components/search-group.vue')['default']
+    SearchGroup: typeof import('@/components/transaction-form/components/search-group.vue')['default']
     Sidebar: typeof import('./../components/sidebar/sidebar.vue')['default']
-    SumField: typeof import('./../components/add-form/components/sum-field.vue')['default']
+    SumField: typeof import('./../components/transaction-form/components/sum-field.vue')['default']
     Table: typeof import('@/components/tables/tables.vue')['default']
+    TableModal: typeof import('./../components/tables/table-modal/table-modal.vue')['default']
     Tables: typeof import('./../components/tables/tables.vue')['default']
+    TransactionForm: typeof import('./../components/transaction-form/transaction-form.vue')['default']
     TransactionTable: typeof import('@/components/tables/tables.vue')['default']
   }
 }

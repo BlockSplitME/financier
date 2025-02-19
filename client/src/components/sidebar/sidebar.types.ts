@@ -3,4 +3,4 @@ export type ISidebarItem = {
   icon: string;
   label: string;
   url?: string;
-}
+};

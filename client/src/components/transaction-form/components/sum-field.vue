@@ -43,40 +43,38 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 
-  import { computed } from 'vue'
+const sum = defineModel<number>("modelValue", {
+  type: Number,
+  required: true,
+});
 
-  const sum = defineModel<number>('modelValue', {
-    type: Number,
-    required: true,
-  })
+const sliderColor = computed(() => {
+  if (sum.value < 300) return "#636363";
+  if (sum.value < 600) return "#635252";
+  if (sum.value < 900) return "#b38484";
+  if (sum.value < 1500) return "#e69191";
+  if (sum.value < 3000) return "#fa7070";
+  return "#fa3434";
+});
 
-  const sliderColor = computed(() => {
-    if (sum.value < 300) return '#636363'
-    if (sum.value < 600) return '#635252'
-    if (sum.value < 900) return '#b38484'
-    if (sum.value < 1500) return '#e69191'
-    if (sum.value < 3000) return '#fa7070'
-    return '#fa3434'
-  })
-
-  const deleteNumber = (event: Event) => {
-    if (sum.value < 10) {
-      event.preventDefault()
-      sum.value = 0
-    }
+const deleteNumber = (event: Event) => {
+  if (sum.value < 10) {
+    event.preventDefault();
+    sum.value = 0;
   }
-  const validateNumber = () => {
-    sum.value = Number(sum.value) ?? 0
-    if (sum.value < 0) sum.value = 0
-  }
-  const sliderDecrement = () => {
-    if (sum.value) sum.value -= 1
-  }
-  const sliderIncrement = () => {
-    sum.value = Number(sum.value) + 1
-  }
+};
+const validateNumber = () => {
+  sum.value = Number(sum.value) ?? 0;
+  if (sum.value < 0) sum.value = 0;
+};
+const sliderDecrement = () => {
+  if (sum.value) sum.value -= 1;
+};
+const sliderIncrement = () => {
+  sum.value = Number(sum.value) + 1;
+};
 </script>
 
-<style scoped lang="css">
-</style>
+<style scoped lang="css"></style>
