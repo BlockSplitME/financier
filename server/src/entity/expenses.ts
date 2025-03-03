@@ -12,6 +12,9 @@ export class Expenses {
     date: Date
 
     @Column({ nullable: false })
+    update_date: Date
+
+    @Column({ nullable: false })
     name: string
 
     @ManyToOne(() => Group, group => group.name)

@@ -14,7 +14,7 @@ export const transactionAdapter = {
         }
     },
 
-    createTransactionPayload (data: CreateTransactionPayload, group: Group, subgroup: Subgroup): any {
+    createTransactionPayload (data: CreateTransactionPayload, group: Group, subgroup: Subgroup, updatedDate: Date): any {
         return {
             date: data.date,
             name: data.name,
@@ -22,6 +22,7 @@ export const transactionAdapter = {
             subgroup,
             description: data.description ?? "",
             sum: data.sum,
+            updated_date: updatedDate,
         }
     }
 }

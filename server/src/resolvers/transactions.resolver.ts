@@ -109,6 +109,9 @@ export class TransactionsResolver {
         if(sortBy) {
             queryBuilder.orderBy(`transaction.${sortBy}`, sortOrder, sortNulls)
         }
+        // else {
+        //     queryBuilder.orderBy(`transaction.update_date`, "ASC", "NULLS FIRST")
+        // }
 
         const data = await queryBuilder.getMany()
         return {
@@ -145,7 +148,7 @@ export class TransactionsResolver {
             const group = await this._getGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome) ?? await this._createGroup(GroupType.GROUP, next, requestBody.group.name as string, isIncome, requestBody.group.description as string);
             const subgroup = await this._getGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome) ?? await this._createGroup(GroupType.SUBGROUP, next, requestBody.subgroup.name as string, isIncome, requestBody.subgroup.description as string);
             if(group && subgroup) {
-                const newItem = repository.create(transactionAdapter.createTransactionPayload(requestBody, group, subgroup));
+                const newItem = repository.create(transactionAdapter.createTransactionPayload(requestBody, group, subgroup, new Date()));
                 await repository.save(newItem);
 
                 const data = await repository.findOne({where: {id: newItem.id}, relations: ['group', 'subgroup']});
@@ -184,7 +187,10 @@ export class TransactionsResolver {
         }
         const isItemExists = await repository.exists({where:{id}});
         if(isItemExists) {
-            await repository.update({id: Number(id)}, requestBody);
+            await repository.update({id: Number(id)}, {
+                ...requestBody,
+                update_date: new Date()
+            });
             const data = await repository.findOne({where: {id}, relations: ['group', 'subgroup']});
             response.status(200).json(transactionAdapter.getTransactionData(data))
         } else {

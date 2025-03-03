@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import {
-  ROUTE_DIAGRAMS_PATH,
+  ROUTE_CHARTS_PATH,
   ROUTE_HOME_PATH,
   ROUTE_TABLES_PATH,
 } from "@/constants";
@@ -33,7 +33,7 @@ const sidebarItems: ISidebarItem[] = [
     label: "Таблицы",
   },
   {
-    route: ROUTE_DIAGRAMS_PATH,
+    route: ROUTE_CHARTS_PATH,
     icon: "mdi-finance",
     label: "Диаграммы",
   },
